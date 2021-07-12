@@ -25,7 +25,9 @@ final class Version20210712093556 extends AbstractMigration
         $this->addSql('CREATE TABLE logs (id INT NOT NULL, dt TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, success BOOLEAN NOT NULL, error VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))');
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'postgresql', 'Migration can only be executed safely on \'postgresql\'.');
 
-        $this->addSql('CREATE TABLE magazines (id INT NOT NULL, title VARCHAR(255) NOT NULL, annotation TEXT DEFAULT NULL, publisher_name TEXT DEFAULT NULL, publication_code VARCHAR(255) NOT NULL, quality DOUBLE PRECISION DEFAULT NULL, publisher_legal_address VARCHAR(255) DEFAULT NULL, age_category VARCHAR(255) DEFAULT NULL, mass_media_reg_num VARCHAR(255) DEFAULT NULL, mass_media_reg_date VARCHAR(255) DEFAULT NULL, image VARCHAR(255) DEFAULT NULL, data JSON NOT NULL, price NUMERIC(20, 2) DEFAULT NULL, pages INT DEFAULT NULL, weight NUMERIC(20, 2) DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE magazines (id INT NOT NULL, title VARCHAR(255) NOT NULL, annotation TEXT DEFAULT NULL, publisher_name TEXT DEFAULT NULL, publication_code VARCHAR(255) NOT NULL, quality DOUBLE PRECISION DEFAULT NULL, publisher_legal_address VARCHAR(255) DEFAULT NULL, age_category VARCHAR(255) DEFAULT NULL, mass_media_reg_num VARCHAR(255) DEFAULT NULL, mass_media_reg_date VARCHAR(255) DEFAULT NULL, image VARCHAR(255) DEFAULT NULL, data JSON NOT NULL, price NUMERIC(20, 2) DEFAULT NULL, pages INT DEFAULT NULL, weight NUMERIC(20, 2) DEFAULT NULL,
+            dt_updated timestamp(0) default NULL::timestamp without time zone,
+            PRIMARY KEY(id))');
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'postgresql', 'Migration can only be executed safely on \'postgresql\'.');
 
         $this->addSql('CREATE TABLE magazines_themes (magazine_id INT NOT NULL, theme_id INT NOT NULL, PRIMARY KEY(magazine_id, theme_id))');

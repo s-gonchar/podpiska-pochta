@@ -116,6 +116,7 @@ class Parser
                 $magazine = Magazine::create($magazineData);
                 $magazine->getThemes()->add($theme);
             } else {
+                $magazine->edit($magazineData);
                 if (!$magazine->getThemes()->contains($theme)) {
                     $magazine->getThemes()->add($theme);
                 }

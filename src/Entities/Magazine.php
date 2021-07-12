@@ -110,9 +110,15 @@ class Magazine
      * @ORM\Column(type="decimal", precision=20, scale=2, nullable=true)
      */
     private $weight;
+    /**
+     * @var \DateTime
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $dtUpdated;
 
     public function __construct() {
         $this->themes = new ArrayCollection();
+        $this->dtUpdated = new \DateTime();
     }
     /**
      * Magazine constructor.
@@ -143,6 +149,38 @@ class Magazine
         $self->data = json_encode($data, JSON_UNESCAPED_UNICODE);
 
         return $self;
+    }
+
+
+    /**
+     * Magazine constructor.
+     * @param array $data
+     * @return Magazine
+     */
+    public function edit($data): self
+    {
+        $this->title = $data['title'] ?? null;
+        $this->annotation = $data['annotation'] ?? null;
+        $this->publisherName = $data['publisherName'] ?? null;
+        $this->publicationCode = $data['publicationCode'] ?? null;
+        $this->quality = $data['quality'] ?? null;
+        $this->publisherLegalAddress = $data['publisherLegalAddress'] ?? null;
+        $this->ageCategory = $data['ageCategory'] ?? null;
+        $this->massMediaRegNum = $data['massMediaRegNum'] ?? null;
+        $this->massMediaRegDate = $data['massMediaRegDate'] ?? null;
+        $this->image = $data['cover']['url'] ?? null;
+        if (isset($data['tcfpsOptions'])) {
+            $this->price = end($data['tcfpsOptions'])['priceFrom'] ?? null;
+        }
+        if (isset($data['tcfpsParts'])) {
+            $this->pages = end($data['tcfpsParts'])['pagesMax'] ?? null;
+            $this->weight = end($data['tcfpsParts'])['weightMax'] ?? null;
+        }
+
+        $this->data = json_encode($data, JSON_UNESCAPED_UNICODE);
+        $this->dtUpdated = new \DateTime();
+
+        return $this;
     }
 
     /**
