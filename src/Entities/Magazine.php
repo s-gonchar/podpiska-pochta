@@ -190,4 +190,12 @@ class Magazine
     {
         return $this->themes;
     }
+
+    /**
+     * @return string
+     */
+    public function getPublicationCode(): string
+    {
+        return $this->publicationCode;
+    }
 }

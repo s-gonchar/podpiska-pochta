@@ -3,6 +3,7 @@
 namespace Services;
 
 use Entities\Log;
+use Entities\Magazine;
 use Entities\Product;
 use Repositories\LogRepository;
 
@@ -23,9 +24,9 @@ class LogService
         $this->logRepository->flush();
     }
 
-    public function printProductMessage(Product $product): void
+    public function printMagazineMessage(Magazine $magazine): void
     {
-        $externalId = $product->getExternalId();
-        print_r("Product with externalId {$externalId} parsed" . PHP_EOL);
+        $publicationCode = $magazine->getPublicationCode();
+        print_r("Magazine with publicationCode {$publicationCode} parsed" . PHP_EOL);
     }
 }

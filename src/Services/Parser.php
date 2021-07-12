@@ -122,6 +122,7 @@ class Parser
                 }
             }
             $this->magazineRepository->persist($magazine);
+            $this->logService->printMagazineMessage($magazine);
         }
 
         $this->themeRepository->flush();
