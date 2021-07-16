@@ -14,6 +14,7 @@ use Entities\Theme;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SessionCookieJar;
+use GuzzleHttp\Cookie\SetCookie;
 use PHPHtmlParser\Dom;
 use Repositories\AgencyRepository;
 use Repositories\LogRepository;
@@ -39,7 +40,7 @@ class Parser
         ThemeRepository $themeRepository,
         MagazineRepository $magazineRepository
     ) {
-        $jar = new SessionCookieJar('PHPSESSID', true);
+        $jar = new SessionCookieJar('JSESSIONID', true);
         $this->client = new Client([
             'base_uri' => self::BASE_URI,
             'cookies' => $jar,
@@ -52,7 +53,6 @@ class Parser
 
     /**
      * @throws \Exception
-     * @throws \Psr\Http\Client\ClientExceptionInterface
      */
     public function parseThemes()
     {
@@ -72,9 +72,9 @@ class Parser
     {
         try {
             $log = $this->logRepository->findLastOneSinceDt(new \DateTime('yesterday'));
-            if ($log && $log->isSuccess()) {
-                return;
-            }
+//            if ($log && $log->isSuccess()) {
+//                return;
+//            }
 
             $this->parseThemes();
             $themes = $themeExternalId ? [$this->themeRepository->getByExternalId($themeExternalId)]
@@ -130,6 +130,8 @@ class Parser
 
     private function getHtmlThemes(): bool|string
     {
+        $cookie = $this->getCookie();
+
         $ch = curl_init();
 
         curl_setopt($ch, CURLOPT_URL, 'https://podpiska.pochta.ru/theme');
@@ -151,7 +153,7 @@ class Parser
         $headers[] = 'Sec-Fetch-User: ?1';
         $headers[] = 'Sec-Fetch-Dest: document';
         $headers[] = 'Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7';
-        $headers[] = 'Cookie: ANALYTICS_UUID=36e40f8f-b896-4fdc-967e-686bc4292b86; _ga=GA1.2.834815054.1619892196; ANON_CART_ID=9d2fc1a82996466dbc4874827cdb11f9; SL_GWPT_Show_Hide_tmp=1; SL_wptGlobTipTmp=1; COOKIE_SUPPORT=true; GUEST_LANGUAGE_ID=en_US; _ym_uid=1625819835354982329; _ym_d=1625819835; _gid=GA1.2.1853349476.1626043588; RP.SID=c2f5b48d32ce4a97a98a8829b5292dc0; JSESSIONID=9BB43F01460165E7D065AEB5E27905A9-n2; XDEBUG_SESSION=XDEBUG_ECLIPSE; _gat=1';
+        $headers[] = "Cookie: ANALYTICS_UUID=36e40f8f-b896-4fdc-967e-686bc4292b86; _ga=GA1.2.834815054.1619892196; ANON_CART_ID=9d2fc1a82996466dbc4874827cdb11f9; SL_GWPT_Show_Hide_tmp=1; SL_wptGlobTipTmp=1; COOKIE_SUPPORT=true; GUEST_LANGUAGE_ID=en_US; _ym_uid=1625819835354982329; _ym_d=1625819835; _gid=GA1.2.1853349476.1626043588; JSESSIONID=9BB43F01460165E7D065AEB5E27905A9-n2; XDEBUG_SESSION=XDEBUG_ECLIPSE; _gat=1; {$cookie};";
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         $result = curl_exec($ch);
@@ -161,5 +163,17 @@ class Parser
         curl_close($ch);
 
         return $result;
+    }
+
+    private function getCookie()
+    {
+        $ch = curl_init('https://podpiska.pochta.ru/theme');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+        curl_setopt($ch, CURLOPT_HEADER, 1);
+        $result = curl_exec($ch);
+        preg_match_all('/^Set-Cookie:\s*([^;]*)/mi', $result, $matches);
+
+        return $matches[1][0] ?? null;
     }
 }
